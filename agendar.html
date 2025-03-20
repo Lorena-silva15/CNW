@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Agendamento</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="calendar">
+            <div class="month">
+                <button onclick="previousMonth()">&#8592;</button>
+                <h2 id="month-name">Janeiro</h2>
+                <button onclick="nextMonth()">&#8594;</button>
+            </div>
+            <div class="days" id="days-container">
+                <!-- Dias serão carregados aqui -->
+            </div>
+        </div>
+        <div class="schedule">
+            <h3>Horários Disponíveis</h3>
+            <ul id="horarios-lista"></ul>
+        </div>
+        <div class="notes">
+            <h3>Anotações</h3>
+            <textarea id="notas" placeholder="Escreva suas anotações aqui..."></textarea>
+        </div>
+    </div>
+    <script src="agendar.js"></script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Painel Admin</title>
+</head>
+<body>
+    <h1>Painel Admin</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Telefone</th>
+                <th>Endereço</th>
+                <th>Data de Nascimento</th>
+                <th>Agendamentos</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="patient-list">
+            <!-- Os pacientes serão carregados aqui -->
+        </tbody>
+    </table>
+    <button onclick="window.location.href='index.html'">Voltar ao Menu</button>
+
+    <script>
+        // Função que carrega os usuários e exibe as informações
+        window.onload = function() {
+            carregarUsuarios();
+        };
+
+        // Detecta mudanças no `localStorage` e atualiza a lista de usuários
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'userUpdated') {
+                carregarUsuarios();
+            }
+        });
+
+        // Função para carregar e exibir os usuários com seus agendamentos
+        function carregarUsuarios() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+
+            let userListHTML = '';
+            users.forEach((user, index) => {
+                userListHTML += `
+                    <tr>
+                        <td>${user.fullName}</td>
+                        <td>${user.cpf}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.address}</td>
+                        <td>${formatarDataNascimento(user.birthdate)}</td>
+                        <td>
+                            <ul>
+                                ${listarAgendamentos(user.cpf, agendamentos)}
+                            </ul>
+                        </td>
+                        <td>
+                            <button onclick="editarUsuario(${index})">Editar</button>
+                            <button onclick="excluirUsuario(${index})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            if (users.length === 0) {
+                userListHTML = '<tr><td colspan="7">Nenhum usuário registrado.</td></tr>';
+            }
+
+            document.getElementById('patient-list').innerHTML = userListHTML;
+        }
+
+        // Função para listar os agendamentos de um usuário
+        function listarAgendamentos(cpf, agendamentos) {
+            // Filtra os agendamentos para o CPF do usuário
+            const userAgendamentos = agendamentos.filter(agendamento => agendamento && agendamento.cpf === cpf);
+            
+            if (userAgendamentos.length > 0) {
+                return userAgendamentos.map(agendamento => 
+                    `<li>Data: ${agendamento.data} - Hora: ${agendamento.hora}</li>`
+                ).join('');
+            } else {
+                return "<li>Não há consultas agendadas.</li>";
+            }
+        }
+
+        // Função para formatar a data de nascimento
+        function formatarDataNascimento(data) {
+            if (!data) return 'Data não informada';
+            const dataFormatada = data.replace(/(\d{4})(\d{2})(\d{2})/, '$3/$2/$1');
+            return dataFormatada;
+        }
+
+        // Função para editar as informações do usuário
+        function editarUsuario(index) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users[index];
+
+            const novoNome = prompt("Novo nome:", user.fullName);
+            const novoTelefone = prompt("Novo telefone:", user.phone);
+            const novoEndereco = prompt("Novo endereço:", user.address);
+            const novaDataNascimento = prompt("Nova data de nascimento (DD/MM/YYYY):", formatarDataNascimento(user.birthdate));
+
+            if (novoNome && novoTelefone && novoEndereco && novaDataNascimento) {
+                users[index].fullName = novoNome;
+                users[index].phone = novoTelefone;
+                users[index].address = novoEndereco;
+                users[index].birthdate = novaDataNascimento.replace(/\D/g, ''); // Remove qualquer caractere não numérico
+
+                localStorage.setItem('users', JSON.stringify(users));
+
+                // Dispara um evento para atualizar a lista no admin.js
+                localStorage.setItem('userUpdated', Date.now());
+
+                alert("Informações atualizadas com sucesso!");
+                carregarUsuarios(); // Recarrega a lista de usuários
+            }
+        }
+
+        // Função para excluir o usuário
+        function excluirUsuario(index) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const agendamentos = JSON.parse(localStorage.getItem('agendamentos')) || [];
+
+            // Pegando o CPF do usuário a ser excluído
+            const cpfUsuario = users[index].cpf;
+
+            // Removendo o usuário da lista
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Removendo os agendamentos relacionados a esse CPF
+            const novosAgendamentos = agendamentos.filter(agendamento => agendamento.cpf !== cpfUsuario);
+            localStorage.setItem('agendamentos', JSON.stringify(novosAgendamentos));
+
+            // Dispara um evento para atualizar a lista no admin.js
+            localStorage.setItem('userUpdated', Date.now());
+
+            alert("Usuário excluído com sucesso!");
+            carregarUsuarios(); // Recarrega a lista de usuários
+        }
+    </script>
+</body>
+</html>

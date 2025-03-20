@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form id="login-form">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Senha:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Entrar</button>
+        </form>
+        <div id="error-message" style="color: red; display: none;">Usuário ou senha incorretos!</div>
+        <button onclick="window.location.href='register.html'">Não tem uma conta? Cadastre-se</button>
+
+    </div>
+    <script>
+       
+        // Permite apenas letras no campo de nome
+        function somenteLetras(event) {
+            let char = String.fromCharCode(event.keyCode);
+            let regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+            if (!regex.test(char)) {
+                event.preventDefault();
+                return false;
+            }
+        }
+    </script>
+
+    <script src="login.js"></script>
+</body>
+</html>
